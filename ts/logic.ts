@@ -1,49 +1,47 @@
-import * as $ from 'jquery';
-    $(document).ready(function() {
-      $('#firstDropdown').on('change', function() {
-        var firstSelection = $(this).val();
-        if (firstSelection) {
-          $('#secondDropdown').prop('disabled', false);
-          // Make an AJAX call to fetch the options for the second dropdown
-          $.ajax({
-            url: 'your-server-endpoint',
-            data: { selection: firstSelection },
-            dataType: 'json',
-            success: function(response) {
-              populateSecondDropdown(response.options);
-            },
-            error: function() {
-              console.log('Error occurred while fetching options.');
-            }
-          });
-        } else {
-          $('#secondDropdown').prop('disabled', true).val('');
-          clearOutputTable();
-        }
-      });
-      
-      $('#secondDropdown').on('change', function() {
-        var firstSelection = $('#firstDropdown').val();
-        var secondSelection = $(this).val();
-        if (secondSelection) {
-          addToOutputTable(firstSelection, secondSelection);
-        }
-      });
+interface Option {
+  value: string;
+  label: string;
+}
+
+const professionListAPI: string = "http://sandbox.gibm.ch/berufe.php"
+const classListAPI: string = "http://sandbox.gibm.ch/klassen.php"
+
+function loadOptions(URL: string, element: string): void {
+  fetch(URL)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not OK');
+      }
+      return response.json();
+    })
+    .then((response: { beruf_name: string; beruf_id: string }[]) => {
+      const options: Option[] = response.map((item) => ({
+        value: item.beruf_id,
+        label: item.beruf_name,
+      }));
+      populateDropdown(options, element);
+      console.log('API Response:', options);
+    })
+    .catch((error) => {
+      console.log('Error occurred while fetching options:', error);
     });
+}
 
-    function populateSecondDropdown(options) {
-      $('#secondDropdown').html('<option value="">Select an option</option>');
-      options.forEach(function(option) {
-        $('#secondDropdown').append('<option value="' + option + '">' + option + '</option>');
-      });
-    }
 
-    function addToOutputTable(firstSelection, secondSelection) {
-      var newRow = $('<tr><td>' + firstSelection + '</td><td>' + secondSelection + '</td></tr>');
-      $('#outputTable tbody').append(newRow);
-    }
+function populateDropdown(options: Option[], id:string): void {
+  const dropdown = document.getElementById('professionList') as HTMLSelectElement;
 
-    function clearOutputTable() {
-      $('#outputTable tbody').empty();
-    }
-  
+  // Clear existing options
+  dropdown.innerHTML = '';
+
+  // Populate dropdown with new options
+  options.forEach((option) => {
+    const optionElement = document.createElement('option');
+    optionElement.value = option.value;
+    optionElement.text = option.label;
+    dropdown.appendChild(optionElement);
+  });
+}
+
+// Call the loadOptions function to fetch and populate the dropdown with proffession
+loadOptions(professionListAPI,"professionList");
