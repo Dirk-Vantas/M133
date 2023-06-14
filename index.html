@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Client Application</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="ts/logic.js"></script>
+  <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">  
+  <style>
+    table {
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>BBZBL Stundenplan</h1>
+  
+  <select id="beurfsListe">
+    <option value="">Select an option</option>
+    <option value="Option 1">Option 1</option>
+    <option value="Option 2">Option 2</option>
+    <option value="Option 3">Option 3</option>
+  </select>
+  
+  <select id="secondDropdown" disabled>
+    <option value="">Select an option</option>
+  </select>
+  
+  <table id="outputTable">
+    <thead>
+      <tr>
+        <th>First Dropdown Selection</th>
+        <th>Second Dropdown Selection</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  
+</body>
+</html>
