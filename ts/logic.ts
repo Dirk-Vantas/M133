@@ -14,11 +14,16 @@ function loadOptions(URL: string, element: string): void {
       }
       return response.json();
     })
+    
     .then((response: { beruf_name: string; beruf_id: string }[]) => {
-      const options: Option[] = response.map((item) => ({
+      const options: Option[] = response
+      .filter((item) => item.beruf_name.trim() !== '') // Filter out empty labels
+      .map((item) => ({
+        
         value: item.beruf_id,
         label: item.beruf_name,
       }));
+      console.log(options)
       populateDropdown(options, element);
       console.log('API Response:', options);
     })
@@ -35,13 +40,50 @@ function populateDropdown(options: Option[], id:string): void {
   dropdown.innerHTML = '';
 
   // Populate dropdown with new options
-  options.forEach((option) => {
-    const optionElement = document.createElement('option');
-    optionElement.value = option.value;
-    optionElement.text = option.label;
-    dropdown.appendChild(optionElement);
+  options.forEach((option,index) => {
+    if (option.label.length != 0) {
+      const optionElement = document.createElement('option');
+      optionElement.value = option.value;
+      optionElement.text = option.label;
+      dropdown.appendChild(optionElement);
+
+      // Select the first option
+      if (index === 0) {
+        optionElement.selected = true;
+      }
+    }
+    
   });
 }
 
-// Call the loadOptions function to fetch and populate the dropdown with proffession
-loadOptions(professionListAPI,"professionList");
+
+
+
+
+
+  
+
+function onDOMLoaded(callback: () => void) {
+  document.addEventListener('DOMContentLoaded', callback);
+}
+
+// Usage
+onDOMLoaded(() => {
+  /// Event listener for the first dropdown
+  const firstDropdown = document.getElementById('professionList') as HTMLSelectElement;
+  firstDropdown.addEventListener('change', (event) => {
+    const selectedValue = (event.target as HTMLSelectElement).value;
+    console.log(selectedValue)
+    //returns ID
+    //TODO read second api documentation and load correct data  and use
+    //existing functions to load and display the data
+    //populateSecondDropdown(selectedValue);
+    //loadOptions(classListAPI)
+  });
+  // Call the loadOptions function to fetch and populate the dropdown with proffession
+  loadOptions(professionListAPI,"professionList");
+  console.log("debug:")
+  console.log(document.getElementById('professionList'))
+});
+
+
