@@ -69,10 +69,10 @@ function loadOptions(URL: string, element: string): void {
         value: item.klasse_id,
         label: item.klasse_name,
       }));
-      console.log("classList:");
-      console.log(options);
+      // console.log("classList:");
+      // console.log(options);
       populateDropdown(options, element);
-      console.log('API Response:', options);
+      //console.log('API Response:', options);
     })
     .catch((error) => {
       console.log('Error occurred while fetching options:', error);
@@ -80,7 +80,6 @@ function loadOptions(URL: string, element: string): void {
   }
 
 }
-
 
 function populateDropdown(options: Option[], id:string): void {
   const dropdown = document.getElementById(id) as HTMLSelectElement;
@@ -110,7 +109,8 @@ function populateDropdown(options: Option[], id:string): void {
 }
 
 function loadTable(URL: string, element: string): void {
-    fetch(URL)
+  console.log('call:',URL)  
+  fetch(URL)
     .then((response) => {
       if (!response.ok) {
         throw new Error('Network response was not OK');
@@ -149,7 +149,7 @@ function loadTable(URL: string, element: string): void {
         
 
         const datePicker = document.getElementById('datepicker') as HTMLInputElement;
-        console.log('//////datepickerdate:',datePicker.value)
+        
         filterTableByWeek(datePicker.value, scheduleItems);
         //console.log('API Response:', options);
       })
@@ -180,22 +180,25 @@ function filterTableByWeek(date:string, scheduleItems: ScheduleItem[]) :void {
   //get all valid entries from the call
   // Filter the data array based on the week number
   
-  const filteredData = scheduleItems.filter((item) => getNumberOfWeek(new Date(item.datum)) === weekNumber);
+  //const filteredData = scheduleItems.filter((item) => getNumberOfWeek(new Date(item.datum)) === weekNumber);
   
   // Function to filter dates based on a given week
 
   
-  const tbody = document.getElementById('outputTable') as HTMLElement
-  tbody.innerHTML = '';
+  const tbody = document.getElementById('outputTable') as HTMLTableElement
+  // Remove all rows from the table refresh
+  while (tbody.rows.length > 0) {
+  tbody.deleteRow(0);
+  }
   
-  console.log('filtered table',filteredData);
+  //console.log('filtered table',filteredData);
 
-  filteredData.forEach((item) => {
+  scheduleItems.forEach((item) => {
     const row = document.createElement("tr");
 
       // Example: Creating a <td> for the 'datum' property
     const datumCell = document.createElement("td");
-    datumCell.textContent = item.datum+"nmweek:"+getNumberOfWeek(new Date(item.datum));
+    datumCell.textContent = item.datum;
     row.appendChild(datumCell);
 
     // Example: Creating a <td> for the 'wochentag' property
@@ -258,7 +261,7 @@ onDOMLoaded(() => {
   const datePicker = document.getElementById('datepicker') as HTMLInputElement;
   
   //handle default if no entry has been made
-  if (localStorage.getItem('pickedDate') === null){
+  if (localStorage.getItem('pickedWeek') === null){
     const today = new Date();
     
     const currentYear:string  = ''+new Date().getFullYear().toString(); // super dirty hack to get date to string
@@ -268,7 +271,9 @@ onDOMLoaded(() => {
     //localStorage.setItem('pickedDate',datePicker.value) 
   }
   else{
-    //datePicker.value = localStorage.getItem('pickedDate');
+    //if user picked preserve 
+    const datePicker = document.getElementById('datepicker') as HTMLInputElement;
+    datePicker.value = localStorage.getItem('pickedWeek');
   }
   
   
@@ -290,13 +295,28 @@ onDOMLoaded(() => {
     console.log(selectedClass)
     console.log(classListAPI+selectedClass)
     //load classes
-    loadTable(lessonListAPI+selectedClass,'outputTable')
-  })
+    const datePicker = document.getElementById('datepicker') as HTMLInputElement;
+    
+    const getWeek = parseInt(datePicker.value.substr(6));
+    const getYear = datePicker.value.substring(0, 4);
+    
+    const week = `&woche=${getWeek}-${getYear}`;
+    loadTable(lessonListAPI+selectedClass+week,'outputTable');
+    
+  });
 
   // Add event listener to detect date changes
   datePicker.addEventListener('change', () => {
     console.log('localstorage date:',localStorage.pickedClass)
-    loadTable(lessonListAPI+localStorage.pickedClass,'outputTable')
+    const datePicker = document.getElementById('datepicker') as HTMLInputElement;
+    
+    const getWeek = parseInt(datePicker.value.substr(6));
+    const getYear = datePicker.value.substring(0, 4);
+    
+    const week = `&woche=${getWeek}-${getYear}`;
+    loadTable(lessonListAPI+localStorage.pickedClass+week,'outputTable');
+
+    localStorage.setItem('pickedWeek',datePicker.value)
   });
   
   

@@ -45,10 +45,10 @@ function loadOptions(URL, element) {
                 value: item.klasse_id,
                 label: item.klasse_name,
             }); });
-            console.log("classList:");
-            console.log(options);
+            // console.log("classList:");
+            // console.log(options);
             populateDropdown(options, element);
-            console.log('API Response:', options);
+            //console.log('API Response:', options);
         })
             .catch(function (error) {
             console.log('Error occurred while fetching options:', error);
@@ -77,6 +77,7 @@ function populateDropdown(options, id) {
     });
 }
 function loadTable(URL, element) {
+    console.log('call:', URL);
     fetch(URL)
         .then(function (response) {
         if (!response.ok) {
@@ -103,7 +104,6 @@ function loadTable(URL, element) {
         console.log("items:");
         console.log(scheduleItems);
         var datePicker = document.getElementById('datepicker');
-        console.log('//////datepickerdate:', datePicker.value);
         filterTableByWeek(datePicker.value, scheduleItems);
         //console.log('API Response:', options);
     })
@@ -124,16 +124,19 @@ function filterTableByWeek(date, scheduleItems) {
     console.log('get number of week new', getNumberOfWeek(selectedDate));
     //get all valid entries from the call
     // Filter the data array based on the week number
-    var filteredData = scheduleItems.filter(function (item) { return getNumberOfWeek(new Date(item.datum)) === weekNumber; });
+    //const filteredData = scheduleItems.filter((item) => getNumberOfWeek(new Date(item.datum)) === weekNumber);
     // Function to filter dates based on a given week
     var tbody = document.getElementById('outputTable');
-    tbody.innerHTML = '';
-    console.log('filtered table', filteredData);
-    filteredData.forEach(function (item) {
+    // Remove all rows from the table refresh
+    while (tbody.rows.length > 0) {
+        tbody.deleteRow(0);
+    }
+    //console.log('filtered table',filteredData);
+    scheduleItems.forEach(function (item) {
         var row = document.createElement("tr");
         // Example: Creating a <td> for the 'datum' property
         var datumCell = document.createElement("td");
-        datumCell.textContent = item.datum + "nmweek:" + getNumberOfWeek(new Date(item.datum));
+        datumCell.textContent = item.datum;
         row.appendChild(datumCell);
         // Example: Creating a <td> for the 'wochentag' property
         var wochentagCell = document.createElement("td");
@@ -180,7 +183,7 @@ onDOMLoaded(function () {
     // Get the date picker element
     var datePicker = document.getElementById('datepicker');
     //handle default if no entry has been made
-    if (localStorage.getItem('pickedDate') === null) {
+    if (localStorage.getItem('pickedWeek') === null) {
         var today = new Date();
         var currentYear = '' + new Date().getFullYear().toString(); // super dirty hack to get date to string
         console.log('curretnYear:', currentYear);
@@ -188,7 +191,9 @@ onDOMLoaded(function () {
         //localStorage.setItem('pickedDate',datePicker.value) 
     }
     else {
-        //datePicker.value = localStorage.getItem('pickedDate');
+        //if user picked preserve 
+        var datePicker_1 = document.getElementById('datepicker');
+        datePicker_1.value = localStorage.getItem('pickedWeek');
     }
     firstDropdown.addEventListener('change', function (event) {
         var selectedValue = event.target.value;
@@ -205,12 +210,21 @@ onDOMLoaded(function () {
         console.log(selectedClass);
         console.log(classListAPI + selectedClass);
         //load classes
-        loadTable(lessonListAPI + selectedClass, 'outputTable');
+        var datePicker = document.getElementById('datepicker');
+        var getWeek = parseInt(datePicker.value.substr(6));
+        var getYear = datePicker.value.substring(0, 4);
+        var week = "&woche=".concat(getWeek, "-").concat(getYear);
+        loadTable(lessonListAPI + selectedClass + week, 'outputTable');
     });
     // Add event listener to detect date changes
     datePicker.addEventListener('change', function () {
         console.log('localstorage date:', localStorage.pickedClass);
-        loadTable(lessonListAPI + localStorage.pickedClass, 'outputTable');
+        var datePicker = document.getElementById('datepicker');
+        var getWeek = parseInt(datePicker.value.substr(6));
+        var getYear = datePicker.value.substring(0, 4);
+        var week = "&woche=".concat(getWeek, "-").concat(getYear);
+        loadTable(lessonListAPI + localStorage.pickedClass + week, 'outputTable');
+        localStorage.setItem('pickedWeek', datePicker.value);
     });
     // Call the loadOptions function to initialize and fetch and populate the dropdown with profession
     loadOptions(professionListAPI, "professionList");
