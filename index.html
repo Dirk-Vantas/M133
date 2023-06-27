@@ -7,13 +7,15 @@
   <style>
     table {
       border-collapse: collapse;
+      width: 100%; /* Take up full width */
     }
     th, td {
       border: 1px solid black;
       padding: 8px;
+      text-align: center; /* Center align the content */
     }
     table {
-      
+      /* box-shadow: 0 0 50px 15px #48abe0 ; */
       transition: box-shadow 1s ease;
     }
 
@@ -21,40 +23,55 @@
       box-shadow: none !important;
     }
     
+    /* Adjustments for smaller screens */
+    @media (min-width: 600px) {
+      h1 {
+        font-size: 24px; /* Decrease font size for smaller screens */
+      }
+      select,
+      input[type="week"],
+      table {
+        font-size: 16px; /* Decrease font size for smaller screens */
+      }
+      th,
+      td {
+        padding: 6px; /* Decrease padding for smaller screens */
+      }
+    }
   </style>
 </head>
 <body>
   <h1>BBZBL Stundenplan</h1>
   
-  <select id="professionList">
-    <option value="">Select an option</option>
-  </select>
-  
-  <select id="classList" disabled>
-    <option value="">Select an option</option>
-  </select>
+  <div style="overflow-x: auto;"> <!-- Add horizontal scroll for smaller screens -->
+    <select id="professionList">
+      <option value="">Select an option</option>
+    </select>
+    
+    <select id="classList" disabled>
+      <option value="">Select an option</option>
+    </select>
 
-  <input type="week" id="datepicker" placeholder="Select a date">
-  
-  
-  <table id="outputTable">
-    <thead>
-      <tr id="tableHeader">
-        <th>Datum</th>
-        <th>WochenTag</th>
-        <th>Von</th>
-        <th>Bis</th>
-        <th>Lehrer</th>
-        <th>Fach</th>
-        <th>Raum</th>
-      </tr>
-    </thead>
-    <tbody>
+    <input type="week" id="datepicker" placeholder="Select a date">
+    
+    
+    <table id="outputTable">
+      <thead>
+        <tr id="tableHeader">
+          <th>Datum</th>
+          <th>WochenTag</th>
+          <th>Von</th>
+          <th>Bis</th>
+          <th>Lehrer</th>
+          <th>Fach</th>
+          <th>Raum</th>
+        </tr>
+      </thead>
+      <tbody>
 
-    </tbody>
-  </table>
+      </tbody>
+    </table>
+  </div>
 
-
-  
 </body>
 </html>
