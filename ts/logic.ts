@@ -20,11 +20,6 @@ const professionListAPI: string = "http://sandbox.gibm.ch/berufe.php"
 const classListAPI: string = "http://sandbox.gibm.ch/klassen.php?beruf_id="
 const lessonListAPI: string = "http://sandbox.gibm.ch/tafel.php?klasse_id="
 
-/* REQUIRED PACKAGES
-- date-fns
-*/
-
-
 function loadOptions(URL: string, element: string): void {
   
   if(element == 'professionList'){
@@ -143,15 +138,10 @@ function loadTable(URL: string, element: string): void {
           raum: item.tafel_raum,
           kommentar: item.tafel_kommentar,
         }));
-        console.log("items:")
-        console.log(scheduleItems);
-
-        
-
+        //get date
         const datePicker = document.getElementById('datepicker') as HTMLInputElement;
-        
+        //render table
         filterTableByWeek(datePicker.value, scheduleItems);
-        //console.log('API Response:', options);
       })
     .catch((error) => {
       console.log('Error occurred while fetching options:', error);
@@ -159,99 +149,80 @@ function loadTable(URL: string, element: string): void {
 }
 
 function filterTableByWeek(date:string, scheduleItems: ScheduleItem[]) :void {
-
-  console.log('filterdate:',date)
-
-  //FORMAT is JJJJ-W23
+  //FORMAT is JJJJ-W23 //mozilla
 
   // Get the selected date from the date picker
   const datePicker = document.getElementById('datepicker') as HTMLInputElement;
   const selectedDate = new Date(datePicker.value);
   
-  console.log('selected date for table',selectedDate)
   // Get the ISO week number of the selected date
   const weekNumber = parseInt(date.substr(6));
   
-  //const selectedWeek = getNumberOfWeek(selectedDate);
-
-  
-  console.log('get number of week new',getNumberOfWeek(selectedDate))
-
   //get all valid entries from the call
-  // Filter the data array based on the week number
-  
+  // Filter the data array based on the week number (! not needed since this is an API function)
   //const filteredData = scheduleItems.filter((item) => getNumberOfWeek(new Date(item.datum)) === weekNumber);
   
-  // Function to filter dates based on a given week
-
-  
   const tbody = document.getElementById('outputTable') as HTMLTableElement
-  // Remove data rows from the table
-const rowCount = tbody.rows.length;
-for (let i = rowCount - 1; i > 0; i--) {
-  tbody.deleteRow(i);
-}
+  // Remove data rows from the table before filling them back up
+  const rowCount = tbody.rows.length;
+  for (let i = rowCount - 1; i > 0; i--) {
+    tbody.deleteRow(i);
+  }
   
-  //console.log('filtered table',filteredData);
-
+  //generating rows
   scheduleItems.forEach((item) => {
     const row = document.createElement("tr");
 
-      // Example: Creating a <td> for the 'datum' property
+     
     const datumCell = document.createElement("td");
     datumCell.textContent = item.datum;
     row.appendChild(datumCell);
 
-    // Example: Creating a <td> for the 'wochentag' property
+    
     const wochentagCell = document.createElement("td");
     wochentagCell.textContent = item.wochentag;
     row.appendChild(wochentagCell);
 
-    // Example: Creating a <td> for the 'von' property
+    
     const vonCell = document.createElement("td");
     vonCell.textContent = item.von;
     row.appendChild(vonCell);
 
-    // Example: Creating a <td> for the 'von' property
+    
     const bisCell = document.createElement("td");
     bisCell.textContent = item.bis;
     row.appendChild(bisCell);
 
-    // Example: Creating a <td> for the 'von' property
+    
     const lehrerCell = document.createElement("td");
     lehrerCell.textContent = item.lehrer;
     row.appendChild(lehrerCell);
 
-    // Example: Creating a <td> for the 'von' property
+    
     const fachCell = document.createElement("td");
     fachCell.textContent = item.fach;
     row.appendChild(fachCell);
 
-    // Example: Creating a <td> for the 'von' property
+    
     const raumCell = document.createElement("td");
     raumCell.textContent = item.raum;
     row.appendChild(raumCell);
 
-    //console.log('row:',row);
-
+    //append new row
     tbody.appendChild(row);
   
   });
 
+    //after update of table display glowing effect to notify user of change
     // Modify the CSS properties directly
-  tbody.style.boxShadow = "0 0 50px 15px #48abe0";
-
-  // After a delay, reset the CSS properties
-  setTimeout(() => {
-    tbody.style.boxShadow = "none";
-  }, 1000);
-
-
-
-
-
+    tbody.style.boxShadow = "0 0 50px 15px #48abe0";
+    // After a delay, reset the CSS properties
+    setTimeout(() => {
+      tbody.style.boxShadow = "none";
+    }, 1000);
 }
 
+//dumb ass function that almost made me rip my hair out
 function getNumberOfWeek(currentDate:Date): number {
   const today = currentDate;
   const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
@@ -259,13 +230,12 @@ function getNumberOfWeek(currentDate:Date): number {
   return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
 }
 
-
-  
+//wait for dom to load before doing anything :)
 function onDOMLoaded(callback: () => void) {
   document.addEventListener('DOMContentLoaded', callback);
 }
 
-// Usage
+//domloader function
 onDOMLoaded(() => {
   /// Event listener for the first dropdown
   const firstDropdown = document.getElementById('professionList') as HTMLSelectElement;
@@ -277,66 +247,44 @@ onDOMLoaded(() => {
   //handle default if no entry has been made
   if (localStorage.getItem('pickedWeek') === null){
     const today = new Date();
-    
     const currentYear:string  = ''+new Date().getFullYear().toString(); // super dirty hack to get date to string
     console.log('curretnYear:',currentYear)
-
     datePicker.value = `${currentYear}-W${getNumberOfWeek(today)}`;
-    //localStorage.setItem('pickedDate',datePicker.value) 
   }
   else{
-    //if user picked preserve 
+    //if user picked date and its store in local storage
     const datePicker = document.getElementById('datepicker') as HTMLInputElement;
     datePicker.value = localStorage.getItem('pickedWeek');
   }
-  
-  
+
   firstDropdown.addEventListener('change', (event) => {
     const selectedValue = (event.target as HTMLSelectElement).value;
-    console.log(selectedValue)
-    localStorage.setItem('pickedProfession',selectedValue)
-    
-    
-    console.log(classListAPI+selectedValue)
-    //load classes
-    loadOptions(classListAPI+selectedValue,'classList')
-    //returns ID
+    localStorage.setItem('pickedProfession',selectedValue);
+    //load classes into dropdown
+    loadOptions(classListAPI+selectedValue,'classList');
   });
-
+  //prepare second dropdown
   secondDropdown.addEventListener('change', (event) =>{
     const selectedClass = (event.target as HTMLSelectElement).value;
+    //save selection in local storage
     localStorage.setItem('pickedClass',selectedClass)
-    console.log(selectedClass)
-    console.log(classListAPI+selectedClass)
     //load classes
     const datePicker = document.getElementById('datepicker') as HTMLInputElement;
-    
     const getWeek = parseInt(datePicker.value.substr(6));
     const getYear = datePicker.value.substring(0, 4);
-    
     const week = `&woche=${getWeek}-${getYear}`;
+    //update Table
     loadTable(lessonListAPI+selectedClass+week,'outputTable');
-    
   });
-
   // Add event listener to detect date changes
   datePicker.addEventListener('change', () => {
-    console.log('localstorage date:',localStorage.pickedClass)
     const datePicker = document.getElementById('datepicker') as HTMLInputElement;
-    
     const getWeek = parseInt(datePicker.value.substr(6));
     const getYear = datePicker.value.substring(0, 4);
-    
     const week = `&woche=${getWeek}-${getYear}`;
     loadTable(lessonListAPI+localStorage.pickedClass+week,'outputTable');
-
     localStorage.setItem('pickedWeek',datePicker.value)
   });
-  
-  
-  // Call the loadOptions function to initialize and fetch and populate the dropdown with profession
+  // Call the loadOptions function to initialize and fetch and populate the dropdown with professions
   loadOptions(professionListAPI,"professionList");
-  
 });
-
-
