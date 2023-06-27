@@ -59,10 +59,6 @@ function populateDropdown(options: Option[], id:string): void {
 
 
 
-
-
-  
-
 function onDOMLoaded(callback: () => void) {
   document.addEventListener('DOMContentLoaded', callback);
 }
