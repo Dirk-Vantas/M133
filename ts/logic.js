@@ -127,9 +127,10 @@ function filterTableByWeek(date, scheduleItems) {
     //const filteredData = scheduleItems.filter((item) => getNumberOfWeek(new Date(item.datum)) === weekNumber);
     // Function to filter dates based on a given week
     var tbody = document.getElementById('outputTable');
-    // Remove all rows from the table refresh
-    while (tbody.rows.length > 0) {
-        tbody.deleteRow(0);
+    // Remove data rows from the table
+    var rowCount = tbody.rows.length;
+    for (var i = rowCount - 1; i > 0; i--) {
+        tbody.deleteRow(i);
     }
     //console.log('filtered table',filteredData);
     scheduleItems.forEach(function (item) {

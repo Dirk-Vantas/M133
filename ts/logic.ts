@@ -186,10 +186,11 @@ function filterTableByWeek(date:string, scheduleItems: ScheduleItem[]) :void {
 
   
   const tbody = document.getElementById('outputTable') as HTMLTableElement
-  // Remove all rows from the table refresh
-  while (tbody.rows.length > 0) {
-  tbody.deleteRow(0);
-  }
+  // Remove data rows from the table
+const rowCount = tbody.rows.length;
+for (let i = rowCount - 1; i > 0; i--) {
+  tbody.deleteRow(i);
+}
   
   //console.log('filtered table',filteredData);
 
