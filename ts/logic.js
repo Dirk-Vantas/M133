@@ -116,13 +116,47 @@ function filterTableByWeek(date, scheduleItems) {
     // Get the selected date from the date picker
     var datePicker = document.getElementById('datepicker');
     var selectedDate = new Date(datePicker.value);
-    console.log(selectedDate);
+    console.log('selected date for table', selectedDate);
     // Get the ISO week number of the selected date
     var selectedWeek = getWeekNumber(selectedDate);
     //get all valid entries from the call
     // Filter the data array based on the week number
     var filteredData = scheduleItems.filter(function (item) { return getWeekNumber(new Date(item.datum)) === selectedWeek; });
-    console.log('filtered table', filterTableByWeek);
+    var tbody = document.getElementById('outputTable');
+    console.log('filtered table', filteredData);
+    filteredData.forEach(function (item) {
+        var row = document.createElement("tr");
+        // Example: Creating a <td> for the 'datum' property
+        var datumCell = document.createElement("td");
+        datumCell.textContent = item.datum;
+        row.appendChild(datumCell);
+        // Example: Creating a <td> for the 'wochentag' property
+        var wochentagCell = document.createElement("td");
+        wochentagCell.textContent = item.wochentag;
+        row.appendChild(wochentagCell);
+        // Example: Creating a <td> for the 'von' property
+        var vonCell = document.createElement("td");
+        vonCell.textContent = item.von;
+        row.appendChild(vonCell);
+        // Example: Creating a <td> for the 'von' property
+        var bisCell = document.createElement("td");
+        bisCell.textContent = item.bis;
+        row.appendChild(bisCell);
+        // Example: Creating a <td> for the 'von' property
+        var lehrerCell = document.createElement("td");
+        lehrerCell.textContent = item.lehrer;
+        row.appendChild(lehrerCell);
+        // Example: Creating a <td> for the 'von' property
+        var fachCell = document.createElement("td");
+        fachCell.textContent = item.fach;
+        row.appendChild(fachCell);
+        // Example: Creating a <td> for the 'von' property
+        var raumCell = document.createElement("td");
+        raumCell.textContent = item.raum;
+        row.appendChild(raumCell);
+        console.log('row:', row);
+        tbody.appendChild(row);
+    });
 }
 function getWeekNumber(d) {
     var currentdate = new Date();
@@ -155,7 +189,7 @@ onDOMLoaded(function () {
     firstDropdown.addEventListener('change', function (event) {
         var selectedValue = event.target.value;
         console.log(selectedValue);
-        //prepare request parameters
+        localStorage.setItem('pickedProfession', selectedValue);
         console.log(classListAPI + selectedValue);
         //load classes
         loadOptions(classListAPI + selectedValue, 'classList');
@@ -163,14 +197,14 @@ onDOMLoaded(function () {
     });
     secondDropdown.addEventListener('change', function (event) {
         var selectedClass = event.target.value;
+        localStorage.setItem('pickedClass', selectedClass);
         console.log(selectedClass);
-        var request = "?klasse_id=".concat(selectedClass);
         console.log(classListAPI + selectedClass);
         //load classes
         loadTable(lessonListAPI + selectedClass, 'outputTable');
     });
     // Add event listener to detect date changes
-    //datePicker.addEventListener('change', () => filterTableByWeek(datePicker.value, ));
+    datePicker.addEventListener('change', function () { return filterTableByWeek(datePicker.value); });
     // Call the loadOptions function to initialize and fetch and populate the dropdown with profession
     loadOptions(professionListAPI, "professionList");
 });
