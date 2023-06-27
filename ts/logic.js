@@ -103,6 +103,7 @@ function loadTable(URL, element) {
         console.log("items:");
         console.log(scheduleItems);
         var datePicker = document.getElementById('datepicker');
+        console.log('//////datepickerdate:', datePicker.value);
         filterTableByWeek(datePicker.value, scheduleItems);
         //console.log('API Response:', options);
     })
@@ -111,7 +112,7 @@ function loadTable(URL, element) {
     });
 }
 function filterTableByWeek(date, scheduleItems) {
-    console.log(date);
+    console.log('filterdate:', date);
     //FORMAT is JJJJ-W23
     // Get the selected date from the date picker
     var datePicker = document.getElementById('datepicker');
@@ -119,10 +120,15 @@ function filterTableByWeek(date, scheduleItems) {
     console.log('selected date for table', selectedDate);
     // Get the ISO week number of the selected date
     var selectedWeek = getWeekNumber(selectedDate);
+    console.log('old weeknumber', getWeekNumber(selectedDate));
+    console.log('new weekNumber:', getISOWeek(selectedDate));
+    console.log('get number of week new', getNumberOfWeek(selectedDate));
     //get all valid entries from the call
     // Filter the data array based on the week number
     var filteredData = scheduleItems.filter(function (item) { return getWeekNumber(new Date(item.datum)) === selectedWeek; });
+    // Function to filter dates based on a given week
     var tbody = document.getElementById('outputTable');
+    tbody.innerHTML = '';
     console.log('filtered table', filteredData);
     filteredData.forEach(function (item) {
         var row = document.createElement("tr");
@@ -154,7 +160,7 @@ function filterTableByWeek(date, scheduleItems) {
         var raumCell = document.createElement("td");
         raumCell.textContent = item.raum;
         row.appendChild(raumCell);
-        console.log('row:', row);
+        //console.log('row:',row);
         tbody.appendChild(row);
     });
 }
@@ -165,6 +171,19 @@ function getWeekNumber(d) {
     var result = Math.ceil((currentdate.getDay() + 1 + numberOfDays) / 7);
     console.log("The week number of the current date (".concat(currentdate, ") is ").concat(result, "."));
     return result;
+}
+function getNumberOfWeek(currentDate) {
+    var today = currentDate;
+    var firstDayOfYear = new Date(today.getFullYear(), 0, 1);
+    var pastDaysOfYear = (today.valueOf() - firstDayOfYear.valueOf()) / 86400000;
+    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+}
+function getISOWeek(date) {
+    var weekStart = new Date(date.getFullYear(), 0, 1);
+    var weekEnd = new Date(date.getFullYear(), 11, 31);
+    var dayOfWeek = weekStart.getDay();
+    var diff = (date.getTime() - weekStart.getTime()) + (dayOfWeek - 1) * 24 * 60 * 60 * 1000;
+    return Math.floor(diff / (7 * 24 * 60 * 60 * 1000));
 }
 function onDOMLoaded(callback) {
     document.addEventListener('DOMContentLoaded', callback);
@@ -204,7 +223,10 @@ onDOMLoaded(function () {
         loadTable(lessonListAPI + selectedClass, 'outputTable');
     });
     // Add event listener to detect date changes
-    datePicker.addEventListener('change', function () { return filterTableByWeek(datePicker.value); });
+    datePicker.addEventListener('change', function () {
+        console.log('localstorage date:', localStorage.pickedClass);
+        loadTable(lessonListAPI + localStorage.pickedClass, 'outputTable');
+    });
     // Call the loadOptions function to initialize and fetch and populate the dropdown with profession
     loadOptions(professionListAPI, "professionList");
 });

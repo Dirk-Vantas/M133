@@ -81,6 +81,7 @@ function loadOptions(URL: string, element: string): void {
 
 }
 
+
 function populateDropdown(options: Option[], id:string): void {
   const dropdown = document.getElementById(id) as HTMLSelectElement;
 
@@ -144,7 +145,11 @@ function loadTable(URL: string, element: string): void {
         }));
         console.log("items:")
         console.log(scheduleItems);
+
+        
+
         const datePicker = document.getElementById('datepicker') as HTMLInputElement;
+        console.log('//////datepickerdate:',datePicker.value)
         filterTableByWeek(datePicker.value, scheduleItems);
         //console.log('API Response:', options);
       })
@@ -153,9 +158,9 @@ function loadTable(URL: string, element: string): void {
     });
 }
 
-function filterTableByWeek(date:string, scheduleItems: ScheduleItem[]) :void{
+function filterTableByWeek(date:string, scheduleItems: ScheduleItem[]) :void {
 
-  console.log(date)
+  console.log('filterdate:',date)
 
   //FORMAT is JJJJ-W23
 
@@ -167,10 +172,20 @@ function filterTableByWeek(date:string, scheduleItems: ScheduleItem[]) :void{
   // Get the ISO week number of the selected date
   const selectedWeek = getWeekNumber(selectedDate);
 
+  console.log('old weeknumber',getWeekNumber(selectedDate))
+  console.log('new weekNumber:',getISOWeek(selectedDate))
+  console.log('get number of week new',getNumberOfWeek(selectedDate))
+
   //get all valid entries from the call
   // Filter the data array based on the week number
+  
   const filteredData = scheduleItems.filter((item) => getWeekNumber(new Date(item.datum)) === selectedWeek);
+  
+  // Function to filter dates based on a given week
+
+  
   const tbody = document.getElementById('outputTable') as HTMLElement
+  tbody.innerHTML = '';
   
   console.log('filtered table',filteredData);
 
@@ -212,24 +227,37 @@ function filterTableByWeek(date:string, scheduleItems: ScheduleItem[]) :void{
     raumCell.textContent = item.raum;
     row.appendChild(raumCell);
 
-    console.log('row:',row)
+    //console.log('row:',row);
 
     tbody.appendChild(row);
   
-  }
+  });
 }
 
-  function getWeekNumber(d: Date): number{
-    const currentdate = new Date();
-    const oneJan = new Date(currentdate.getFullYear(), 0, 1);
-    const numberOfDays = Math.floor((currentdate.getTime() - oneJan.getTime()) / (24 * 60 * 60 * 1000));
-    const result = Math.ceil((currentdate.getDay() + 1 + numberOfDays) / 7);
-    console.log(`The week number of the current date (${currentdate}) is ${result}.`);
-    return result
-  }
+function getWeekNumber(d: Date): number{
+  const currentdate = new Date();
+  const oneJan = new Date(currentdate.getFullYear(), 0, 1);
+  const numberOfDays = Math.floor((currentdate.getTime() - oneJan.getTime()) / (24 * 60 * 60 * 1000));
+  const result = Math.ceil((currentdate.getDay() + 1 + numberOfDays) / 7);
+  console.log(`The week number of the current date (${currentdate}) is ${result}.`);
+  return result
+}
+
+function getNumberOfWeek(currentDate:Date): number {
+  const today = currentDate;
+  const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
+  const pastDaysOfYear = (today.valueOf() - firstDayOfYear.valueOf()) / 86400000;
+  return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+}
+
+function getISOWeek(date: Date): number {
+  const weekStart = new Date(date.getFullYear(), 0, 1);
+  const weekEnd = new Date(date.getFullYear(), 11, 31);
+  const dayOfWeek = weekStart.getDay();
+  const diff = (date.getTime() - weekStart.getTime()) + (dayOfWeek - 1) * 24 * 60 * 60 * 1000;
+  return Math.floor(diff / (7 * 24 * 60 * 60 * 1000));
+}
   
-
-
 function onDOMLoaded(callback: () => void) {
   document.addEventListener('DOMContentLoaded', callback);
 }
@@ -278,7 +306,10 @@ onDOMLoaded(() => {
   })
 
   // Add event listener to detect date changes
-  datePicker.addEventListener('change', () => filterTableByWeek(datePicker.value, ));
+  datePicker.addEventListener('change', () => {
+    console.log('localstorage date:',localStorage.pickedClass)
+    loadTable(lessonListAPI+localStorage.pickedClass,'outputTable')
+  });
   
   
   // Call the loadOptions function to initialize and fetch and populate the dropdown with profession
