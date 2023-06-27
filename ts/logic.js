@@ -119,13 +119,12 @@ function filterTableByWeek(date, scheduleItems) {
     var selectedDate = new Date(datePicker.value);
     console.log('selected date for table', selectedDate);
     // Get the ISO week number of the selected date
-    var selectedWeek = getWeekNumber(selectedDate);
-    console.log('old weeknumber', getWeekNumber(selectedDate));
-    console.log('new weekNumber:', getISOWeek(selectedDate));
+    var weekNumber = parseInt(date.substr(6));
+    //const selectedWeek = getNumberOfWeek(selectedDate);
     console.log('get number of week new', getNumberOfWeek(selectedDate));
     //get all valid entries from the call
     // Filter the data array based on the week number
-    var filteredData = scheduleItems.filter(function (item) { return getWeekNumber(new Date(item.datum)) === selectedWeek; });
+    var filteredData = scheduleItems.filter(function (item) { return getNumberOfWeek(new Date(item.datum)) === weekNumber; });
     // Function to filter dates based on a given week
     var tbody = document.getElementById('outputTable');
     tbody.innerHTML = '';
@@ -134,7 +133,7 @@ function filterTableByWeek(date, scheduleItems) {
         var row = document.createElement("tr");
         // Example: Creating a <td> for the 'datum' property
         var datumCell = document.createElement("td");
-        datumCell.textContent = item.datum;
+        datumCell.textContent = item.datum + "nmweek:" + getNumberOfWeek(new Date(item.datum));
         row.appendChild(datumCell);
         // Example: Creating a <td> for the 'wochentag' property
         var wochentagCell = document.createElement("td");
@@ -164,26 +163,11 @@ function filterTableByWeek(date, scheduleItems) {
         tbody.appendChild(row);
     });
 }
-function getWeekNumber(d) {
-    var currentdate = new Date();
-    var oneJan = new Date(currentdate.getFullYear(), 0, 1);
-    var numberOfDays = Math.floor((currentdate.getTime() - oneJan.getTime()) / (24 * 60 * 60 * 1000));
-    var result = Math.ceil((currentdate.getDay() + 1 + numberOfDays) / 7);
-    console.log("The week number of the current date (".concat(currentdate, ") is ").concat(result, "."));
-    return result;
-}
 function getNumberOfWeek(currentDate) {
     var today = currentDate;
     var firstDayOfYear = new Date(today.getFullYear(), 0, 1);
     var pastDaysOfYear = (today.valueOf() - firstDayOfYear.valueOf()) / 86400000;
     return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
-}
-function getISOWeek(date) {
-    var weekStart = new Date(date.getFullYear(), 0, 1);
-    var weekEnd = new Date(date.getFullYear(), 11, 31);
-    var dayOfWeek = weekStart.getDay();
-    var diff = (date.getTime() - weekStart.getTime()) + (dayOfWeek - 1) * 24 * 60 * 60 * 1000;
-    return Math.floor(diff / (7 * 24 * 60 * 60 * 1000));
 }
 function onDOMLoaded(callback) {
     document.addEventListener('DOMContentLoaded', callback);
@@ -197,10 +181,11 @@ onDOMLoaded(function () {
     var datePicker = document.getElementById('datepicker');
     //handle default if no entry has been made
     if (localStorage.getItem('pickedDate') === null) {
-        var currentDate = new Date();
-        var isoWeekNumber = getWeekNumber(currentDate);
-        console.log('no date set using default, now!');
-        datePicker.value = new Date().toISOString().split('T')[0]; //isoWeekNumber.toString();
+        var today = new Date();
+        var currentYear = '' + new Date().getFullYear().toString(); // super dirty hack to get date to string
+        console.log('curretnYear:', currentYear);
+        datePicker.value = "".concat(currentYear, "-W").concat(getNumberOfWeek(today));
+        //localStorage.setItem('pickedDate',datePicker.value) 
     }
     else {
         //datePicker.value = localStorage.getItem('pickedDate');
