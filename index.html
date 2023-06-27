@@ -12,6 +12,15 @@
       border: 1px solid black;
       padding: 8px;
     }
+    table {
+      
+      transition: box-shadow 1s ease;
+    }
+
+    .fade-out {
+      box-shadow: none !important;
+    }
+    
   </style>
 </head>
 <body>
@@ -26,6 +35,7 @@
   </select>
 
   <input type="week" id="datepicker" placeholder="Select a date">
+  
   
   <table id="outputTable">
     <thead>
@@ -43,6 +53,7 @@
 
     </tbody>
   </table>
+
 
   
 </body>

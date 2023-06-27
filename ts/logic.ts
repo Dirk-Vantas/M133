@@ -236,6 +236,19 @@ function filterTableByWeek(date:string, scheduleItems: ScheduleItem[]) :void {
     tbody.appendChild(row);
   
   });
+
+    // Modify the CSS properties directly
+  tbody.style.boxShadow = "0 0 50px 15px #48abe0";
+
+  // After a delay, reset the CSS properties
+  setTimeout(() => {
+    tbody.style.boxShadow = "none";
+  }, 1000);
+
+
+
+
+
 }
 
 function getNumberOfWeek(currentDate:Date): number {
